@@ -28,16 +28,17 @@
       font-family: 'Kiwi Maru', sans-serif;
       margin: 0;
       padding: 0;
+      padding-bottom: 150px; /* フッター分の余白追加 */
       background: linear-gradient(to bottom, #ffeef3, #ffffff);
       background-image: url('background.png');
       max-width: 100%;
       overflow-x: hidden;
+      position: relative;
     }
     img, iframe, canvas {
   max-width: 100%;
   height: auto;
 }
-
 
     /* 星アニメーション */
     body::before {
@@ -98,11 +99,6 @@
     #howto-section .title-cloud {
   color: #ff69b4 !important;
 }
-    #howto-section {
-      margin-top: 40px;
-      padding-bottom: 200px; /* ←ここ大事！犬猫が絶対かぶらない */
-    }
-
 #howto-section p {
   color: #9f7382; /* ピンク系の文字色 */
   font-weight: bold; /* 太字にする（必要なら） */
@@ -197,10 +193,29 @@ textarea:focus {
       cursor: pointer;
     }
 
-    .animal { position: fixed; width: 70px; z-index: 1000; pointer-events: none; transition: all 0.4s ease; }
-    .dog { bottom: 20px; left: 20px; }
-    .cat { bottom: 20px; right: 20px; }
-    .howto-open .animal { bottom: 100px !important; } /* 使い方開いたら上に逃げる */
+   .animal {
+  position: fixed; /* ← absoluteからfixedに変更！ */
+  width: 70px;
+  z-index: 1000; /* 十分に上のレイヤーにしておく */
+  pointer-events: none; /* ←クリックなどの邪魔を防ぐ */
+  transition: bottom 0.4s ease; /* 追加: スムーズに逃げる */
+}
+
+.dog {
+  bottom: 20px;
+  left: 20px;
+}
+
+.cat {
+  bottom: 20px;
+  right: 20px;
+}
+
+/* 追加: 使い方開いたら上に逃げる */
+.howto-open .animal {
+  bottom: 130px !important;
+}
+
     .share-options {
       display: none;
       margin-top: 10px;
@@ -214,6 +229,20 @@ textarea:focus {
   resize: none; /* リサイズ禁止 */
   min-height: 50px; /* 最低高さを設定 */
 }
+
+/* 追加: 削除ボタン */
+.delete-btn {
+  background-color: #ff94b7 !important;
+  font-size: 0.9em;
+  padding: 8px 16px;
+  margin-top: 10px;
+}
+
+/* 追加: 使い方セクションの余白 */
+#howto-section {
+  padding-bottom: 280px; /* 犬猫が絶対かぶらないようにたっぷり */
+}
+
  @media screen and (max-width: 768px) {
   input[type="text"],
   input[type="url"],
@@ -322,6 +351,26 @@ textarea {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* 追加: 固定TOP戻るボタン */
+.footer-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff0f5;
+  padding: 15px;
+  text-align: center;
+  z-index: 999;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  border-top: 2px dashed #f8a5c2;
+}
+.footer-nav a {
+  color: #e06b8b;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.1em;
+}
   </style>
 </head>
 <body>
@@ -330,12 +379,11 @@ textarea {
     <div class="title-cloud">♡推しプロフィールメーカー♡</div>
     <div id="profileDisplayArea">
       <!-- ここにプロフィールが出力されてる -->
-        <div class="profile-block">
+        <div class="profile-block" data-id="1">
           <label class="custom-file-upload">
             画像アップロード
             <input type="file" accept="image/*" onchange="previewImage(this)">
           </label>
-          <img class="preview" src="" style="width: 100%; max-width: 200px; display: none; margin-top: 10px;">
           <img class="preview" src="" style="width: 100%; max-width: 200px; display: none; margin-top: 10px;">
           <label>名前：</label><input type="text">
           <label>あだ名：</label><input type="text">
@@ -356,7 +404,7 @@ textarea {
       <button onclick="toggleHowTo()">使い方を見る</button>
     </div>
 
-    <div class="share-options" id="shareOptions">
+    <div class="share-options" id="shareOptions" style="display: none;">
       <p>シェア先を選んでね：</p>
       <button onclick="shareTo('line')">LINE</button>
       <button onclick="shareTo('x')">X</button>
@@ -364,9 +412,9 @@ textarea {
       <button onclick="saveAsImage()">画像保存</button>
       <div id="imagePreviewContainer"></div>
     </div>
-    <img src="dog.png" class="animal dog">
-    <img src="cat.png" class="animal cat">
-  <footer class="ad-footer">
+
+    <!-- 広告フッター（元通り全部） -->
+    <footer class="ad-footer">
     <p class="ad-title">♡ 推し活におすすめグッズ ♡</p>
     <div class="ad-banner">
       <!-- 相合傘キーホルダー -->
@@ -411,18 +459,28 @@ textarea {
 
 </footer>
     </div>
-  </footer>
-  <div id="howto-section" style="display:none;">
-    <div class="title-cloud">使い方</div>
-    <p>1. 画像をアップロードして、名前やあだ名、一言などを入力します。</p>
-    <p>2. 「完成してシェア」ボタンを押すと、シェア先を選ぶことができます。</p>
-    <p>3. 「プロフィール追加」ボタンで最大3人までプロフィールを追加できます。</p>
-    <p>4. 「使い方を見る」ボタンでこの説明が表示されます。</p>
-    <p><strong>【画像の保存について】</strong><br>
+
+    <img src="dog.png" class="animal dog">
+    <img src="cat.png" class="animal cat">
+
+    <!-- 使い方セクション（container外に移動して余白確保） -->
+    <div id="howto-section" style="display:none; margin-top: 40px;">
+      <div class="title-cloud">使い方</div>
+      <p>1. 画像をアップロードして、名前やあだ名、一言などを入力します。</p>
+      <p>2. 「完成してシェア」ボタンを押すと、シェア先を選ぶことができます。</p>
+      <p>3. 「プロフィール追加」ボタンで最大3人までプロフィールを追加できます。（追加したものは削除ボタンで消せます）</p>
+      <p>4. 「使い方を見る」ボタンでこの説明が表示されます。</p>
+      <p><strong>【画像の保存について】</strong><br>
       スマホの方は、画像が表示されたら<strong>長押しして「写真に追加」</strong>などを選んでください。<br>
-      PCの方は、自動でダウンロードが始まりますが、始まらない場合は表示された画像を<strong>右クリック→「名前を付けて画像を保存」</strongしてください。</p>
+      PCの方は、自動でダウンロードが始まりますが、始まらない場合は表示された画像を<strong>右クリック→「名前を付けて画像を保存」</strong>してください。</p>
+    </div>
+
   </div>
 
+  <!-- 追加: 一番下の固定TOP戻る -->
+  <div class="footer-nav">
+    <a href="https://mofu-mitsu.github.io/">← TOPへ戻る</a>
+  </div>
   
   <script>
     function previewImage(input) {
@@ -485,16 +543,20 @@ function addProfile() {
   const displayArea = document.getElementById("profileDisplayArea"); // ここ変更！
   const newFields = document.createElement("div");
   newFields.classList.add("profile-block"); // スタイル調整しやすい用にclass追加
+  newFields.dataset.id = profileCount + 1;
   newFields.innerHTML = `
     <hr>
-  <label>【${profileCount + 1}人目】</label>
-  <div class="profile">
-    <label class="custom-file-upload">
-      画像アップロード
-      <input type="file" accept="image/*" onchange="previewImage(this)">
-    </label>
-    <img class="preview" src="" style="width: 100%; max-width: 200px; display: none; margin-top: 10px;">
-  </div>
+    <div style="text-align: right;">
+      <button class="delete-btn" onclick="deleteProfile(this)">このプロフィール削除</button>
+    </div>
+    <label>【${profileCount + 1}人目】</label>
+    <div class="profile">
+      <label class="custom-file-upload">
+        画像アップロード
+        <input type="file" accept="image/*" onchange="previewImage(this)">
+      </label>
+      <img class="preview" src="" style="width: 100%; max-width: 200px; display: none; margin-top: 10px;">
+    </div>
     <label>名前：</label>
     <input type="text">
     <label>あだ名：</label>
@@ -516,9 +578,35 @@ function addProfile() {
   displayArea.appendChild(newFields); // ここを container → displayArea に変更！
   profileCount++;
 }
+
+function deleteProfile(btn) {
+  if (profileCount <= 1) {
+    alert("1人目は消せないよ！");
+    return;
+  }
+  const block = btn.closest('.profile-block');
+  block.remove();
+  profileCount--;
+  // 番号を振り直す（見た目だけ）
+  const blocks = document.querySelectorAll('.profile-block');
+  blocks.forEach((b, index) => {
+    const label = b.querySelector('label');
+    if (label && label.textContent.includes('【')) {
+      label.textContent = index === 0 ? '' : `【${index + 1}人目】`;
+    }
+  });
+}
+
     function toggleHowTo() {
       const section = document.getElementById('howto-section');
-      section.style.display = (section.style.display === 'block') ? 'none' : 'block';
+      const body = document.body;
+      if (section.style.display === 'block') {
+        section.style.display = 'none';
+        body.classList.remove('howto-open');
+      } else {
+        section.style.display = 'block';
+        body.classList.add('howto-open');
+      }
     }
   </script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -597,7 +685,7 @@ function addProfile() {
      const base64Image = dataURL.split(',')[1];
      const clientId = 'bb8064419b2b7be';
  
-     fetch('https://api.imgur.com/3/image', {
+     fetch('https://api.imgur.com/3/image', {  /* https固定 */
        method: 'POST',
        headers: {
          Authorization: 'Client-ID ' + clientId,
@@ -660,7 +748,7 @@ function addProfile() {
       const formData = new FormData();
       formData.append('image', imageBlob);
 
-      fetch('https://api.imgur.com/3/image', {
+      fetch('https://api.imgur.com/3/image', {  /* https固定 */
         method: 'POST',
         headers: {
           Authorization: 'Client-ID bb8064419b2b7be'
@@ -687,7 +775,7 @@ function addProfile() {
           previewContainer.innerHTML = ''; // ローディングを消す
         const shareBtn = document.createElement('button');
         shareBtn.textContent = platform === 'line' ? 'LINEでシェアする' : 'Xでシェアする';
-        shareBtn.style = 'margin-top: 15px; padding: 10px 20px; font-size: 1em;';
+        shareBtn.style = 'margin-top: 15px; padding: 10px 20px; font-size: 1em; background-color: #f77c9e; color: white; border: none; border-radius: 20px;';
         shareBtn.onclick = () => {
           window.open(shareUrl, '_blank');
         };
@@ -752,3 +840,4 @@ function restoreAfterScreenshot() {
  </script>
 
 </body>
+</html>
