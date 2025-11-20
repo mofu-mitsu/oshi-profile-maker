@@ -98,6 +98,11 @@
     #howto-section .title-cloud {
   color: #ff69b4 !important;
 }
+    #howto-section {
+      margin-top: 40px;
+      padding-bottom: 200px; /* ←ここ大事！犬猫が絶対かぶらない */
+    }
+
 #howto-section p {
   color: #9f7382; /* ピンク系の文字色 */
   font-weight: bold; /* 太字にする（必要なら） */
@@ -192,22 +197,10 @@ textarea:focus {
       cursor: pointer;
     }
 
-   .animal {
-  position: fixed; /* ← absoluteからfixedに変更！ */
-  width: 70px;
-  z-index: 1000; /* 十分に上のレイヤーにしておく */
-  pointer-events: none; /* ←クリックなどの邪魔を防ぐ */
-}
-
-.dog {
-  bottom: 20px;
-  left: 20px;
-}
-
-.cat {
-  bottom: 20px;
-  right: 20px;
-}
+    .animal { position: fixed; width: 70px; z-index: 1000; pointer-events: none; transition: all 0.4s ease; }
+    .dog { bottom: 20px; left: 20px; }
+    .cat { bottom: 20px; right: 20px; }
+    .howto-open .animal { bottom: 100px !important; } /* 使い方開いたら上に逃げる */
     .share-options {
       display: none;
       margin-top: 10px;
